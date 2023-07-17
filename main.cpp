@@ -1,5 +1,6 @@
 #include <iostream>
 #include <random>
+#include <curses.h>
 bool gameOver;
 const int width = 20;
 const int height = 20;
@@ -34,6 +35,10 @@ void draw() {
         for (int j = 0; j < width; j++) {
             if (j == 0 || j == width - 1) {
                 std::cout << "# ";
+            } else if (i == y && j == x) {
+                std::cout << "O";
+            } else if (i == fruitY && j == fruitX) {
+                std::cout << "F";
             } else {
                 std::cout << "  ";
             }
@@ -45,14 +50,70 @@ void draw() {
         std::cout << "# ";
     }
     std::cout << "\n";
+
+    std::cout << "Score: " << score << "\n";
+}
+
+int khbit() {
+    int ch;
+    nodelay(stdscr, TRUE);
+    ch = getch();
+    if (ch != ERR) {
+        ungetch(ch);
+        return 1;
+    }
+    return 0;
 }
 
 void input() {
-
+    if (khbit()) {
+        switch (getch()) {
+            case 'a':
+                dir = LEFT;
+                break;
+            case 'd':
+                dir = RIGHT;
+                break;
+            case 'w':
+                dir = UP;
+                break;
+            case 's':
+                dir = DOWN;
+                break;
+            case 'x':
+                gameOver = true;
+                break;
+        }
+    }
 }
 
 void logic() {
+    switch (dir) {
+        case LEFT:
+            x--;
+            break;
+        case RIGHT:
+            x++;
+            break;
+        case UP:
+            y--;
+            break;
+        case DOWN:
+            y++;
+            break;
+        default:
+            break;
 
+    }
+
+    if (x > width || x < 0 || y > height || y < 0) {
+        gameOver = true;
+    }
+    if (x == fruitX && y == fruitY) {
+        score += 10;
+        fruitX  = rand() % width;
+        fruitY = rand() % height;
+    }
 }
 
 int main() {
